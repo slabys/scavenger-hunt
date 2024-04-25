@@ -1,0 +1,8 @@
+{
+  "name": "Scavenger hunt",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite",
+  "id": "a0dd1756"
+}
