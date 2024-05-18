@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "isStarted": true,
+    "currentRoute": 0,
+    "start": {
+      "latlng": {
+        "lat": 50.2037,
+        "lng": 15.8292
+      },
+      "radius": 50
+    },
+    "route": [
+      {
+        "latlng": {
+          "lat": 50.2037,
+          "lng": 15.8292
+        },
+        "radius": 50
+      }
+    ],
+    "finish": {
+      "latlng": {
+        "lat": 50.2077,
+        "lng": 15.8292
+      },
+      "radius": 50
+    }
+  }
+]
