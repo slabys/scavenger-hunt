@@ -1,8 +1,9 @@
 [
   {
     "id": 1,
-    "isStarted": true,
-    "currentRoute": 0,
+    "name": "Hradec Králové Beer Hunting",
+    "dueDate": "2024-04-25T12:28:00.695Z",
+    "description": "This hunt will take you around city of Hradec Králové, where you will be able to taste different kinds of beers in multiple pubs. So grab you pitcher and let's get going!",
     "start": {
       "latlng": {
         "lat": 50.2037,
@@ -10,8 +11,29 @@
       },
       "radius": 50
     },
+    "finish": {
+      "latlng": {
+        "lat": 50.2077,
+        "lng": 15.8292
+      },
+      "radius": 50
+    },
     "route": [
       {
+        "taskTitle": "What you see is what you get.",
+        "taskDescription": "Write what you see written on building of FIM.",
+        "type": "text",
+        "latlng": {
+          "lat": 50.2037,
+          "lng": 15.8292
+        },
+        "radius": 50,
+        "answer": "asddd"
+      },
+      {
+        "taskTitle": "What you see is what you get.",
+        "taskDescription": "Write what you see written on building of FIM.",
+        "type": "text",
         "latlng": {
           "lat": 50.2037,
           "lng": 15.8292
@@ -19,12 +41,9 @@
         "radius": 50
       }
     ],
-    "finish": {
-      "latlng": {
-        "lat": 50.2077,
-        "lng": 15.8292
-      },
-      "radius": 50
-    }
+    "isStarted": true,
+    "startTime": "Sun Jun 02 2024 00:50:36 GMT+0200 (Central European Summer Time)",
+    "finishTime": null,
+    "currentRoute": 0
   }
 ]

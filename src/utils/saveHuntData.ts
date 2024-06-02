@@ -8,8 +8,6 @@ export const saveHuntData = async (huntId: number, updatedHuntData: any) => {
       body: JSON.stringify(updatedHuntData),
     });
 
-    console.log(response.ok)
-
     if (!response.ok) {
       throw new Error('Failed to save hunt data');
     }

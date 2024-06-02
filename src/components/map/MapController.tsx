@@ -1,118 +1,124 @@
-import { Circle, LayerGroup, Marker, Popup, useMap } from "react-leaflet";
-import { icon, marker, Marker as MarkerProps } from "leaflet";
-import React, { useEffect, useMemo, useState } from "react";
-import { IonButton, IonText, useIonViewWillEnter } from "@ionic/react";
-import { HuntDataProps } from "@components/hunts/HuntDetail";
-
-const locIcon = icon({
-  iconUrl: "mapIcons/location.svg",
-  iconSize: [32, 32], // size of the icon
-});
-
-const startIcon = icon({
-  iconUrl: "mapIcons/start.png",
-  iconSize: [32, 32], // size of the icon
-  iconAnchor: [15, 30],
-});
-
-const finishIcon = icon({
-  iconUrl: "mapIcons/finish.png",
-  iconSize: [32, 32], // size of the icon
-  iconAnchor: [15, 30],
-});
+import { Circle, FeatureGroup, Marker, Popup, useMap } from "react-leaflet";
+import { LocationEvent } from "leaflet";
+import React, { useState } from "react";
+import { useIonViewWillEnter } from "@ionic/react";
+import { HuntDataProps } from "@src/utils/types";
+import { finishIcon, startIcon } from "@components/map/icons";
+import Modal, { ModalProps } from "@components/modals/Modal";
+import { useTypedIonModal } from "@src/utils/useTypedIonModal";
+import { calcDistanceInM } from "@src/utils/calcDistanceInM";
+import CurrentRoute from "@components/map/CurrentRoute";
+import { ModalReturnProps } from "@components/modals/TaskModal";
 
 interface MapControllerProps {
   huntData: HuntDataProps;
-  onUpdate: (updatedData: Partial<{ isStarted: boolean; currentRoute: number; }>) => void;
+  onUpdate: (updatedData: Partial<HuntDataProps>) => void;
 }
 
 const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => {
   const map = useMap();
-  const [isStarted, setIsStarted] = useState<boolean>(false);
-  const [currentRoute, setCurrentRoute] = useState<number>(0);
-  const [currLocation, setCurrLocation] = useState<GeolocationPosition>();
-  let currLocationMarker: MarkerProps | undefined = undefined;
+  const [currLocation, setCurrLocation] = useState<LocationEvent>();
 
-  console.log(isStarted);
-  console.log(currLocation);
+  const handleTaskSubmit = (value: string) => {
+    if(!value) return;
+    let newHuntData = huntData
+    newHuntData.route[huntData.currentRoute].answer = value
+    newHuntData.currentRoute = newHuntData.currentRoute + 1
+
+    onUpdate({ ...newHuntData });
+  };
+
+  const onLocationFound = (locationEvent: LocationEvent) => {
+    if (!locationEvent) return;
+    setCurrLocation(locationEvent);
+  };
 
   useIonViewWillEnter(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((value) => setCurrLocation(value));
-    }
+    map.on("locationfound", onLocationFound);
+    map.on("locationerror", () => {});
+
+    map.locate({ watch: true, enableHighAccuracy: true });
   }, []);
 
+  const [modal, closeModal] = useTypedIonModal<ModalProps>(Modal,
+    // Modal component props
+    {
+      title: huntData.name,
+      startModal: !huntData.isStarted ? {
+        handleStart: () => {
+          onUpdate({ isStarted: true, startTime: new Date().toString(), currentRoute: 0 });
+          closeModal();
+        },
+      } : undefined,
+      finishModal: huntData.isStarted ? {
+        handleFinish: () => {
+          onUpdate({ finishTime: new Date().toString() });
+          closeModal();
+        },
+      } : undefined,
+      dismiss: (data, role) => {
+        if (role === "close") {
+          closeModal();
+        }
+      },
+    },
+  );
 
-  useEffect(() => {
-    if (!currLocation) return;
-    if (currLocationMarker) map.removeLayer(currLocationMarker);
+  return <>
+    {/* START feature group */}
+    {currLocation?.latlng && <FeatureGroup>
+      <Circle
+        center={currLocation.latlng}
+        radius={currLocation.accuracy}
+      />
+      <Marker position={currLocation.latlng} />
+      <Popup>{`You are within ${currLocation.accuracy.toFixed(0)}m`}</Popup>
+    </FeatureGroup>
+    }
+    {!huntData.isStarted && <FeatureGroup eventHandlers={{
+      click: () => {
+        if (!currLocation?.latlng) return;
+        const distance = calcDistanceInM(map, currLocation.latlng, huntData.start.latlng);
+        if (distance < 5000) modal();
+      },
+    }}>
+      <Circle
+        center={huntData.start.latlng}
+        radius={huntData.start.radius}
+        color="green"
+        fillColor="green"
+      />
+      <Marker position={huntData.start.latlng} icon={startIcon} />
+      {currLocation?.latlng &&
+        <Popup>You are {calcDistanceInM(map, currLocation.latlng, huntData.start.latlng).toFixed(2)}m far away</Popup>}
+    </FeatureGroup>}
+    {/* Current Route display */}
 
-    currLocationMarker = marker([currLocation.coords.latitude, currLocation.coords.longitude], { icon: locIcon })
-      .bindPopup(`You are within ${currLocation.coords.accuracy.toFixed(0)}m`)
-      .addTo(map);
-    console.log(currLocation);
-  }, [currLocation]);
+    {huntData.currentRoute < huntData.route.length &&
+      <CurrentRoute huntData={huntData} currentLocation={currLocation} map={map} handleTaskSubmit={handleTaskSubmit} />
+    }
 
-  useEffect(() => {
-    onUpdate({ currentRoute: currentRoute });
-  }, [currentRoute]);
-
-  const calcDistance = useMemo(() => {
-    console.log({
-      lat: huntData.start.latlng.lat,
-      lng: huntData.start.latlng.lng,
-    }, {
-      lat: currLocation?.coords.latitude ?? huntData.start.latlng.lat,
-      lng: currLocation?.coords.longitude ?? huntData.start.latlng.lng,
-    });
-    return map.distance({
-      lat: huntData.start.latlng.lat,
-      lng: huntData.start.latlng.lng,
-    }, {
-      lat: currLocation?.coords.latitude ?? huntData.start.latlng.lat,
-      lng: currLocation?.coords.longitude ?? huntData.start.latlng.lng,
-    });
-  }, [currLocation]);
-
-  return <LayerGroup>
-    <Circle
-      center={huntData.start.latlng}
-      radius={huntData.start.radius}
-      color="green"
-      fillColor="green"
+    {/* END feature group */}
+    {huntData.currentRoute === huntData.route.length && <FeatureGroup
+      eventHandlers={{
+        click: () => {
+          if (!currLocation?.latlng) return;
+          const distance = calcDistanceInM(map, currLocation.latlng, huntData.start.latlng);
+          if (distance < 5000) modal();
+        },
+      }}
     >
-      <Popup>
-        <IonButton onClick={() => {
-          if (calcDistance > 3000) {
-            console.log("yes" + calcDistance);
-          } else {
-            console.log("no" + calcDistance);
-          }
-        }}>Distance</IonButton>
-      </Popup>
-    </Circle>
-    <Marker position={huntData.start.latlng} icon={startIcon}>
-      <Popup>
-        {calcDistance < 3000 ? <IonButton onClick={() => {
-          onUpdate({ isStarted: true });
-          setIsStarted(true);
-          setCurrentRoute(0);
-        }}>START</IonButton> : <IonText>You need to walk {calcDistance}</IonText>}
-      </Popup>
-    </Marker>
-
-    <Circle
-      center={huntData.finish.latlng}
-      radius={huntData.finish.radius}
-      color="red"
-      fillColor="red"
-    >
-      <Popup>Finish</Popup>
-    </Circle>
-    <Marker position={huntData.finish.latlng} icon={finishIcon}>
-      <Popup>Finish</Popup>
-    </Marker>
-  </LayerGroup>;
+      <Circle
+        center={huntData.finish.latlng}
+        radius={huntData.finish.radius}
+        color="red"
+        fillColor="red"
+      />
+      <Marker position={huntData.finish.latlng} icon={finishIcon} />
+      {currLocation?.latlng &&
+        <Popup>You are {calcDistanceInM(map, currLocation.latlng, huntData.start.latlng).toFixed(2)}m far away</Popup>}
+    </FeatureGroup>}
+  </>;
 };
 
 export default MapController;

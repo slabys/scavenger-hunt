@@ -23,7 +23,6 @@ app.get("/api/hunt-data", (req, res) => {
 
 app.post("/api/hunt-data/:id", (req, res) => {
   const huntId = parseInt(req.params.id, 10);
-  console.log(huntId)
   const updatedData = req.body;
 
   const huntDataPath = path.join(__dirname, "public/huntData.json");
@@ -33,11 +32,11 @@ app.post("/api/hunt-data/:id", (req, res) => {
   if (huntIndex !== -1) {
     huntData[huntIndex] = { ...huntData[huntIndex], ...updatedData };
     fs.writeFileSync(huntDataPath, JSON.stringify(huntData, null, 2));
-    res.send({ status: "success" });
+    res.send({ status: "Success" });
     console.log("OK")
   } else {
     res.status(404).send({ status: "not found" });
-    console.log("not ok")
+    console.log("Hunt not ok")
   }
 });
 
