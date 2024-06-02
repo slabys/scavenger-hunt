@@ -10,7 +10,6 @@ import {
   IonTitle,
   IonToolbar, useIonRouter,
 } from "@ionic/react";
-import "@pages/list/Tab1.css";
 import React, { useEffect, useState } from "react";
 import { getDateWithTime } from "@src/utils/time";
 import { HuntDataProps } from "@src/utils/types";
@@ -18,27 +17,27 @@ import { HuntDataProps } from "@src/utils/types";
 
 const HuntingList: React.FC = () => {
   const router = useIonRouter();
-  const [searchList, setSearchList] = useState<HuntDataProps[]>([])
+  const [searchList, setSearchList] = useState<HuntDataProps[]>([]);
   const [huntsList, setHuntsList] = useState<HuntDataProps[] | null>(null);
 
   useEffect(() => {
     fetch("/huntData.json")
       .then(response => response.json())
-      .then(data => setHuntsList(data))
+      .then(data => setHuntsList(data));
   }, []);
 
-  if (!huntsList) return "Loading..."
+  if (!huntsList) return "Loading...";
 
   const handleInput = (value: string) => {
     let query = value.toLowerCase();
     setSearchList(huntsList.filter((d) => d.name.toLowerCase().indexOf(query) > -1));
-  }
+  };
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Hunting List  🏹</IonTitle>
+          <IonTitle>Hunting List 🏹</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding-top">
@@ -49,7 +48,10 @@ const HuntingList: React.FC = () => {
           return <IonCard key={`hunt-card-${hunt.id}-${index}`} className={"ion-padding-bottom"}>
             <IonCardHeader>
               <IonCardTitle>{hunt.name}</IonCardTitle>
-              <IonCardSubtitle>Due date: {getDateWithTime(hunt.dueDate)}</IonCardSubtitle>
+              <IonCardSubtitle
+                color={new Date(hunt.dueDate) < new Date() ? "danger" : "success"}
+              >
+                Due date: {getDateWithTime(hunt.dueDate)}</IonCardSubtitle>
             </IonCardHeader>
 
             <IonCardContent>

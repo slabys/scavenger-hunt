@@ -8,6 +8,7 @@ import Modal, { ModalProps } from "@components/modals/Modal";
 import { useTypedIonModal } from "@src/utils/useTypedIonModal";
 import { calcDistanceInM } from "@src/utils/calcDistanceInM";
 import CurrentRoute from "@components/map/CurrentRoute";
+import { TaskModalReturnProps } from "@components/modals/TaskModal";
 
 interface MapControllerProps {
   huntData: HuntDataProps;
@@ -18,11 +19,11 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
   const map = useMap();
   const [currLocation, setCurrLocation] = useState<LocationEvent>();
 
-  const handleTaskSubmit = (value: string) => {
-    if(!value) return;
-    let newHuntData = huntData
-    newHuntData.route[huntData.currentRoute].answer = value
-    newHuntData.currentRoute = newHuntData.currentRoute + 1
+  const handleTaskSubmit = (value: TaskModalReturnProps) => {
+    if (!value) return;
+    let newHuntData = huntData;
+    newHuntData.route[huntData.currentRoute].answer = value;
+    newHuntData.currentRoute = newHuntData.currentRoute + 1;
 
     onUpdate({ ...newHuntData });
   };
@@ -34,7 +35,8 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
 
   useIonViewWillEnter(() => {
     map.on("locationfound", onLocationFound);
-    map.on("locationerror", () => {});
+    map.on("locationerror", () => {
+    });
 
     map.locate({ watch: true, enableHighAccuracy: true });
   }, []);
@@ -43,13 +45,13 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
     // Modal component props
     {
       title: huntData.name,
-      startModal: !huntData.isStarted ? {
+      startModal: huntData.startTime === null ? {
         handleStart: () => {
-          onUpdate({ isStarted: true, startTime: new Date().toString(), currentRoute: 0 });
+          onUpdate({ startTime: new Date().toString(), currentRoute: 0 });
           closeModal();
         },
       } : undefined,
-      finishModal: huntData.isStarted ? {
+      finishModal: !!huntData.startTime ? {
         handleFinish: () => {
           onUpdate({ finishTime: new Date().toString() });
           closeModal();
@@ -74,11 +76,11 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
       <Popup>{`You are within ${currLocation.accuracy.toFixed(0)}m`}</Popup>
     </FeatureGroup>
     }
-    {!huntData.isStarted && <FeatureGroup eventHandlers={{
+    {!huntData.startTime && <FeatureGroup eventHandlers={{
       click: () => {
         if (!currLocation?.latlng) return;
         const distance = calcDistanceInM(map, currLocation.latlng, huntData.start.latlng);
-        if (distance < 5000) modal();
+        if (distance < huntData.route[huntData.currentRoute].radius) modal();
       },
     }}>
       <Circle
@@ -93,7 +95,7 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
     </FeatureGroup>}
     {/* Current Route display */}
 
-    {huntData.currentRoute < huntData.route.length &&
+    {!!huntData.startTime && huntData.currentRoute < huntData.route.length &&
       <CurrentRoute huntData={huntData} currentLocation={currLocation} map={map} handleTaskSubmit={handleTaskSubmit} />
     }
 
@@ -103,7 +105,7 @@ const MapController: React.FC<MapControllerProps> = ({ huntData, onUpdate }) => 
         click: () => {
           if (!currLocation?.latlng) return;
           const distance = calcDistanceInM(map, currLocation.latlng, huntData.start.latlng);
-          if (distance < 5000) modal();
+          if (distance < huntData.route[huntData.currentRoute].radius) modal();
         },
       }}
     >

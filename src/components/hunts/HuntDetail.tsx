@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  IonBackButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonPage,
+  IonBackButton, IonButton,
+  IonButtons, IonCard, IonCol,
+  IonContent, IonFab, IonGrid,
+  IonHeader, IonImg, IonItem,
+  IonPage, IonRow,
   IonText,
   IonTitle,
   IonToolbar, useIonRouter, useIonViewWillEnter,
@@ -13,11 +13,14 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import MapController from "@components/map/MapController";
 import { saveHuntData } from "@src/utils/saveHuntData";
 import { HuntDataProps } from "@src/utils/types";
+import { getDateWithTime } from "@src/utils/time";
+import { usePhotoGallery, UserPhoto } from "@src/utils/usePhotoGallery";
 
 const HuntDetail: React.FC = () => {
   const router = useIonRouter();
   const huntId = parseInt(router.routeInfo.pathname.split("/hunt/")[1], 10);
   const [huntData, setHuntData] = useState<HuntDataProps | null>(null);
+  const { photos } = usePhotoGallery();
 
   // Trigger resize, to invalidate map and re-render it
   useIonViewWillEnter(() => {
@@ -50,17 +53,51 @@ const HuntDetail: React.FC = () => {
       </IonToolbar>
     </IonHeader>
     <IonContent fullscreen className="ion-padding-top">
-      <MapContainer center={huntData.start.latlng} zoom={12} style={{ width: "100%", height: "500px" }}>
-        <TileLayer
-          attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapController huntData={huntData} onUpdate={handleUpdate} />
-      </MapContainer>
-      {huntData.route.map((route, i) => {
-        return route?.answer &&
-          <React.Fragment key={`fragment-${i}`}><IonText>{`${i}: ${route?.answer}`}</IonText><br /></React.Fragment>;
-      })}
+      {!!huntData.finishTime ? <IonTitle color={"success"}>You already finished this hunt!</IonTitle> :
+        <MapContainer center={huntData.start.latlng} zoom={12} style={{ width: "100%", height: "500px" }}>
+          <TileLayer
+            attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapController huntData={huntData} onUpdate={handleUpdate} />
+        </MapContainer>}
+      <IonCard className={"ion-padding"}>
+        {huntData.startTime && <IonItem>
+          <IonText><b>Start:</b> {getDateWithTime(huntData.startTime)}</IonText>
+        </IonItem>
+        }
+        {!!huntData.startTime && <IonItem>
+          <IonText><b>Routes:</b></IonText>
+          <IonCol>
+            {huntData.route.map((route, i) => {
+              if (typeof route?.answer === "string") {
+                return route?.answer &&
+                  <IonRow key={`fragment-${i}`}>
+                    <IonText>{`${i}: ${route?.answer.toString()}`}</IonText>
+                  </IonRow>;
+              } else {
+                return route?.answer &&
+                  <IonRow key={`fragment-${i}`}>
+                    <IonText>{`${i}:`}</IonText>
+                    <IonCol size="6">
+                      <IonImg
+                        src={photos.find((f) => f.filepath === (route.answer as UserPhoto).filepath)?.webviewPath} />
+                    </IonCol>
+                  </IonRow>;
+              }
+            })}
+          </IonCol>
+        </IonItem>}
+        {huntData.finishTime && <IonItem>
+          <IonText><b>Finish:</b> {getDateWithTime(huntData.finishTime)}</IonText>
+          <br />
+          <IonButton
+            onClick={() => handleUpdate({ finishTime: null, startTime: null, isStarted: false, currentRoute: 0 })}>
+            Restart Hunt!!!
+          </IonButton>
+        </IonItem>
+        }
+      </IonCard>
     </IonContent>
   </IonPage>;
 };

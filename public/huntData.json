@@ -13,8 +13,8 @@
     },
     "finish": {
       "latlng": {
-        "lat": 50.2077,
-        "lng": 15.8292
+        "lat": 50.2025,
+        "lng": 15.8302
       },
       "radius": 50
     },
@@ -24,25 +24,73 @@
         "taskDescription": "Write what you see written on building of FIM.",
         "type": "text",
         "latlng": {
-          "lat": 50.2037,
-          "lng": 15.8292
+          "lat": 50.205,
+          "lng": 15.83
         },
         "radius": 50,
-        "answer": "asddd"
+        "answer": "{"
       },
+      {
+        "taskTitle": "What you see is what you get.",
+        "taskDescription": "Take picture of your!",
+        "type": "picture",
+        "latlng": {
+          "lat": 50.204,
+          "lng": 15.8322
+        },
+        "radius": 50,
+        "answer": {
+          "filepath": "1717334988839.jpeg",
+          "webviewPath": "blob:http://localhost:5173/7298f7fc-6107-4a8e-97be-73f3921a1760"
+        }
+      }
+    ],
+    "startTime": null,
+    "finishTime": null,
+    "currentRoute": 0
+  },
+  {
+    "id": 2,
+    "name": "New hunt to get stunned",
+    "dueDate": "2024-08-25T12:28:00.695Z",
+    "description": "This hunt will take you around city of Hradec Králové, where you will be able to taste different kinds of beers in multiple pubs. So grab you pitcher and let's get going!",
+    "start": {
+      "latlng": {
+        "lat": 50.2037,
+        "lng": 15.8292
+      },
+      "radius": 50
+    },
+    "finish": {
+      "latlng": {
+        "lat": 50.2025,
+        "lng": 15.8302
+      },
+      "radius": 50
+    },
+    "route": [
       {
         "taskTitle": "What you see is what you get.",
         "taskDescription": "Write what you see written on building of FIM.",
         "type": "text",
         "latlng": {
-          "lat": 50.2037,
-          "lng": 15.8292
+          "lat": 50.205,
+          "lng": 15.83
+        },
+        "radius": 50
+      },
+      {
+        "taskTitle": "What you see is what you get.",
+        "taskDescription": "Take picture of your!",
+        "type": "picture",
+        "latlng": {
+          "lat": 50.204,
+          "lng": 15.8322
         },
         "radius": 50
       }
     ],
-    "isStarted": true,
-    "startTime": "Sun Jun 02 2024 00:50:36 GMT+0200 (Central European Summer Time)",
+    "startTime": null,
     "finishTime": null,
     "currentRoute": 0
   }

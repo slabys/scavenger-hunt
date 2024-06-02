@@ -1,4 +1,4 @@
-
+import { UserPhoto } from "@src/utils/usePhotoGallery";
 
 export interface RouteType {
   "taskTitle": string;
@@ -8,7 +8,7 @@ export interface RouteType {
     lat: number;
     lng: number;
   };
-  answer?: string
+  answer?: string | UserPhoto;
   radius: number;
 }
 

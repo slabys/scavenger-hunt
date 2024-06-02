@@ -2,13 +2,12 @@ import {
   IonIcon, IonLabel,
   IonRouterOutlet, IonTabBar, IonTabButton, IonTabs,
 } from "@ionic/react";
-import "@pages/list/Tab1.css";
 import React from "react";
 import { IonReactRouter } from "@ionic/react-router";
 import Render from "@components/router/Render";
 import { compass, mapOutline, person } from "ionicons/icons";
 import HuntingList from "@pages/list/HuntingList";
-import Tab2 from "@pages/Tab2";
+import Overview from "@pages/Overview";
 import Tab3 from "@pages/Tab3";
 
 export interface TabsToComponentsProps {
@@ -31,11 +30,11 @@ const Router: React.FC = () => {
       render: <HuntingList />
     },
     {
-      name: "Active hunts",
-      tab: "active",
-      href: "/active",
+      name: "Hunt overview",
+      tab: "Active Hunt overview",
+      href: "/overview",
       icon: compass,
-      render: <Tab2 />
+      render: <Overview />
     },
     {
       name: "My account",

@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import {
   IonButton, IonCard,
-  IonContent,
+  IonContent, IonFab, IonFabButton,
   IonHeader, IonIcon, IonInput,
   IonPage, IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 
-import { close } from "ionicons/icons";
+import { camera, close } from "ionicons/icons";
 import { GeneralModalType } from "@src/utils/useTypedIonModal";
 import { HuntDataProps, RouteType } from "@src/utils/types";
+import { usePhotoGallery, UserPhoto } from "@src/utils/usePhotoGallery";
 
-export type ModalReturnProps = string | null
+export type TaskModalReturnProps = UserPhoto | string | null
 
-export interface TaskModalProps extends GeneralModalType<ModalReturnProps> {
+export interface TaskModalProps extends GeneralModalType<TaskModalReturnProps> {
   huntData: HuntDataProps;
 }
 
@@ -46,11 +47,23 @@ const TaskText: React.FC<TaskTextProps> = ({ onSubmit }) => {
 
 const TaskController: React.FC<{
   taskPoint: RouteType
-  onSubmit: ({ value, submit }: { value: string, submit: string }) => void
+  onSubmit: ({ value, submit }: { value: TaskModalReturnProps, submit: string }) => void
 }> = ({ taskPoint, onSubmit }) => {
+  const { photos, takePhoto } = usePhotoGallery();
+  console.log(photos[-1]);
 
   if (taskPoint.type === "text") {
     return <TaskText onSubmit={onSubmit} />;
+  }
+  if (taskPoint.type === "picture") {
+    return <IonFab vertical="bottom" horizontal="center" slot="fixed">
+      <IonFabButton onClick={async () => {
+        const photo = await takePhoto();
+        onSubmit({ value: photo, submit: "submit" });
+      }}>
+        <IonIcon icon={camera}></IonIcon>
+      </IonFabButton>
+    </IonFab>;
   }
 };
 
@@ -58,7 +71,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ dismiss, huntData }) => {
   const taskPoint = huntData.route[huntData.currentRoute];
 
   const onSubmit = ({ value, submit }: {
-    value?: string, submit?: string
+    value?: TaskModalReturnProps, submit?: string
   }) => {
     if (submit === "submit") dismiss(value, "submit");
   };

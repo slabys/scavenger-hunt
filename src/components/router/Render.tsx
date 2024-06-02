@@ -1,4 +1,3 @@
-import "@pages/list/Tab1.css";
 import React from "react";
 import { Redirect, Route } from "react-router-dom";
 import { TabsToComponentsProps } from "@components/router/Router";
