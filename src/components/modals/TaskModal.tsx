@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   IonButton, IonCard,
   IonContent,
@@ -10,8 +10,6 @@ import {
 
 import { close } from "ionicons/icons";
 import { GeneralModalType } from "@src/utils/useTypedIonModal";
-import StartModalContent from "@components/map/StartModalContent";
-import FinishModalContent from "@components/map/FinishModalContent";
 import { HuntDataProps, RouteType } from "@src/utils/types";
 
 export type ModalReturnProps = string | null
@@ -21,7 +19,7 @@ export interface TaskModalProps extends GeneralModalType<ModalReturnProps> {
 }
 
 export interface TaskTextProps {
-  onSubmit: ({ value, submit }: { value: string, submit: string }) => void
+  onSubmit: ({ value, submit }: { value: string, submit: string }) => void;
 }
 
 const TaskText: React.FC<TaskTextProps> = ({ onSubmit }) => {
@@ -29,7 +27,7 @@ const TaskText: React.FC<TaskTextProps> = ({ onSubmit }) => {
   return <IonCard>
     <form onSubmit={(e) => {
       e.preventDefault();
-      onSubmit({ value: answer, submit: "submit" })
+      onSubmit({ value: answer, submit: "submit" });
     }}
     >
       <IonInput

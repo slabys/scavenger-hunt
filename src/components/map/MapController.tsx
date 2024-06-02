@@ -8,7 +8,6 @@ import Modal, { ModalProps } from "@components/modals/Modal";
 import { useTypedIonModal } from "@src/utils/useTypedIonModal";
 import { calcDistanceInM } from "@src/utils/calcDistanceInM";
 import CurrentRoute from "@components/map/CurrentRoute";
-import { ModalReturnProps } from "@components/modals/TaskModal";
 
 interface MapControllerProps {
   huntData: HuntDataProps;
