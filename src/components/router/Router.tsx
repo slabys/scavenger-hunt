@@ -1,8 +1,8 @@
 import Render from "@components/router/Render";
 import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
+import Account from "@pages/Account";
 import Overview from "@pages/Overview";
-import Tab3 from "@pages/Tab3";
 import HuntingList from "@pages/list/HuntingList";
 import { compass, mapOutline, person } from "ionicons/icons";
 import React from "react";
@@ -37,7 +37,7 @@ const Router: React.FC = () => {
 			tab: "account",
 			href: "/account",
 			icon: person,
-			render: <Tab3 />,
+			render: <Account />,
 		},
 	];
 
